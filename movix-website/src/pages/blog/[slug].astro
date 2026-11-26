@@ -1,0 +1,43 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import Logo from '../../components/Logo.astro';
+import { site } from '../../config/site';
+import { posts } from '../../lib/blog';
+import { article, breadcrumbs } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return posts.map((p) => ({ params: { slug: p.slug }, props: { post: p } }));
+}
+const { post } = Astro.props;
+const path = `/blog/${post.slug}/`;
+const { Content } = post;
+const fmt = (d: string) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Base
+  page="blog"
+  ogType="article"
+  title={`${post.title} | Movix`}
+  description={post.description}
+  noindex={!site.blogPublic || post.example}
+  schema={[
+    article({ title: post.title, description: post.description, path, date: post.date }),
+    breadcrumbs([{ name: 'Success cases', path: '/blog/' }, { name: post.title, path }]),
+  ]}
+>
+  <Header current="blog" cta="/#contact" />
+  <main id="main">
+    <article class="post">
+      <div class="wrap post-wrap">
+        <a class="post-back" href="/blog/">← All success cases</a>
+        <p class="post-tag"><Logo sub={post.service === 'linkMovix' ? 'link' : 'fleet'} size={22} /> {post.client}</p>
+        <h1>{post.title}</h1>
+        <p class="post-meta">{fmt(post.date)}</p>
+        {post.result && <p class="post-result">{post.result}</p>}
+        <div class="prose"><Content /></div>
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Base>

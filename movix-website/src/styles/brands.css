@@ -1,0 +1,34 @@
+/* Movix brand tokens: Pop Route (chosen 2026-11-18). Source: brand-kit/option-b-pop-route. */
+
+:root {
+  --ink: #1B1A1F;
+  --ink-muted: #55535C;
+  --paper: #FFF7F9;
+  --surface: #FFFFFF;
+  --tint: #FFE3EA;
+  --line: #F1D9E0;
+  --parent: #FF3D6E;
+  --on-parent: #FFFFFF;
+  --accent: #FF3D6E;
+  --accent-strong: #E8235A;
+  --on-accent: #FFFFFF;
+  --fleet: #FFB800;
+  --on-fleet: #1B1A1F;
+  --fleet-text: #9A6A00;
+  --fleet-tint: #FFF1C7;
+  --link: #14D29A;
+  --on-link: #1B1A1F;
+  --link-text: #08835F;
+  --link-tint: #D3F7EA;
+  --dark: #1B1A1F;
+  --on-dark: #FFF3F6;
+  --hero-grad: radial-gradient(1200px 600px at 85% -10%, #FFD3DE 0%, transparent 60%),
+    radial-gradient(800px 500px at -10% 110%, #FFF1C7 0%, transparent 60%);
+  --brand-grad: linear-gradient(120deg, #FF3D6E 0%, #FF7A59 55%, #FFB800 100%);
+  --radius-card: 28px;
+  --radius-btn: 999px;
+  --font-display: "Outfit Variable", "Outfit", system-ui, sans-serif;
+  --font-body: "DM Sans Variable", "DM Sans", system-ui, sans-serif;
+  --display-weight: 800;
+  --display-tracking: -0.03em;
+}

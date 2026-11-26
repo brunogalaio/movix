@@ -1,0 +1,128 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Contact from '../components/Contact.astro';
+import Logo from '../components/Logo.astro';
+import Handoff from '../components/Handoff.astro';
+import Faq from '../components/Faq.astro';
+import { service, breadcrumbs, faq } from '../lib/schema';
+import { pathFor, pick, type Locale } from '../i18n';
+import { fleet } from '../i18n/fleet';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = pick(fleet, locale);
+const path = pathFor('fleet', locale);
+---
+<Base
+  page="fleet"
+  locale={locale}
+  title={c.title}
+  description={c.description}
+  schema={[
+    service({ name: 'fleetMovix', path, description: c.description, serviceType: c.serviceType, locale }),
+    breadcrumbs([{ name: c.crumb, path }], locale),
+    faq(c.faq),
+  ]}
+>
+  <Header current="fleet" locale={locale} />
+
+  <main id="main">
+    <section class="hero hero-stack" id="top">
+      <div class="wrap">
+        <div class="hero-copy">
+          <p class="eyebrow eyebrow-logo"><Logo sub="fleet" size={24} /><span>{c.hero.eyebrow}</span></p>
+          <h1>{c.hero.h1}</h1>
+          <p class="lead">{c.hero.lead}</p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary" href="#contact">{c.hero.cta}</a>
+            <a class="btn btn-ghost" href="#how">{c.hero.how}</a>
+          </div>
+        </div>
+        <Handoff t={c.handoff} />
+      </div>
+    </section>
+
+    <section class="facts" aria-label={c.factsAria}>
+      <div class="wrap facts-inner">
+        {c.facts.map((f) => <div><strong>{f.b}</strong><span>{f.t}</span></div>)}
+      </div>
+    </section>
+
+    <section class="section" id="why">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="kicker">{c.why.kicker}</p>
+          <h2>{c.why.h2}</h2>
+          <p class="sub">{c.why.sub}</p>
+        </div>
+        <div class="trio">
+          {c.why.cards.map((card) => <div class="trio-card"><h3>{card.h}</h3><p>{card.p}</p></div>)}
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tint" id="how">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="kicker">{c.how.kicker}</p>
+          <h2>{c.how.h2}</h2>
+        </div>
+        <ol class="flow">
+          {c.how.steps.map((s, i) => (
+            <li>
+              <span class="flow-n">{i + 1}</span>
+              <h3>{s.t}</h3>
+              <p>{s.d}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" id="lanes">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="kicker">{c.lanes.kicker}</p>
+          <h2>{c.lanes.h2}</h2>
+        </div>
+        <div class="lanes">
+          <article class="lane lane-main">
+            <span class="badge">{c.lanes.focus}</span>
+            <h3>{c.lanes.horeca.h}</h3>
+            <p>{c.lanes.horeca.p}</p>
+            <ul class="ticks ticks-tone">
+              {c.lanes.horeca.items.map((i) => <li>{i}</li>)}
+            </ul>
+          </article>
+          <article class="lane">
+            <h3>{c.lanes.parcels.h}</h3>
+            <p>{c.lanes.parcels.p}</p>
+            <ul class="ticks ticks-tone">
+              {c.lanes.parcels.items.map((i) => <li>{i}</li>)}
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark">
+      <div class="wrap split">
+        <div>
+          <p class="kicker kicker-dark">{c.proof.kicker}</p>
+          <h2>{c.proof.h2}</h2>
+          <p class="sub">{c.proof.sub}</p>
+        </div>
+        <ul class="proof-list">
+          {c.proof.items.map((i) => <li><strong>{i.b}</strong><span>{i.t}</span></li>)}
+        </ul>
+      </div>
+    </section>
+
+    <Faq items={c.faq} locale={locale} />
+
+    <Contact locale={locale} interest="fleet" title={c.contact.title} text={c.contact.text} />
+  </main>
+  <Footer current="fleet" locale={locale} />
+</Base>

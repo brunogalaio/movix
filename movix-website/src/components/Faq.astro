@@ -1,0 +1,23 @@
+---
+import { uiFor } from '../i18n/ui';
+import type { Locale } from '../i18n';
+interface Props { items: { q: string; a: string }[]; title?: string; locale?: Locale }
+const { items, locale = 'en', title } = Astro.props;
+const f = uiFor(locale).faq;
+---
+<section class="section" id="faq">
+  <div class="wrap faq">
+    <div>
+      <p class="kicker">{f.kicker}</p>
+      <h2>{title ?? f.title}</h2>
+    </div>
+    <div class="faq-list">
+      {items.map((it) => (
+        <details>
+          <summary>{it.q}</summary>
+          <p>{it.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

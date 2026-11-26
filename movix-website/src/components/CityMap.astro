@@ -1,0 +1,76 @@
+---
+/** Hero illustration: idle ride-hail drivers fan out from pickup points (linkMovix),
+    Movix vans leave the cross-dock for venues and parcel stops (fleetMovix). */
+import type { Ui } from '../i18n/ui';
+interface Props { variant?: 'all' | 'link' | 'fleet'; t: Ui['map'] }
+const { variant = 'all', t } = Astro.props;
+const streets = [
+  'M0 70 H560', 'M0 150 C140 140 260 170 560 150', 'M0 240 H560', 'M0 330 C180 320 330 345 560 325',
+  'M70 0 V500', 'M170 0 C160 160 190 300 175 500', 'M300 0 V500', 'M420 0 C430 150 410 330 425 500', 'M510 0 V500',
+  'M0 440 L250 0', 'M310 500 L560 60',
+];
+const van1 = 'M90 420 C120 360 170 330 230 300';
+const van2 = 'M90 420 C180 430 290 410 360 380';
+const fleet1 = 'M90 420 C200 380 360 290 455 215';
+const fleet2 = 'M455 215 C470 170 470 140 480 105';
+const linkA = ['M230 300 C215 250 190 210 160 170', 'M230 300 C260 250 300 220 330 190', 'M230 300 C240 230 245 160 250 95'];
+const linkB = ['M360 380 C400 360 450 350 500 330', 'M360 380 C370 340 380 300 380 260'];
+const drops = [[160, 170], [330, 190], [250, 95], [500, 330], [380, 260]];
+const fleetExtra = ['M90 420 C110 330 150 230 190 150', 'M90 420 C200 400 300 330 345 255'];
+const venues = variant === 'fleet' ? [[455, 215], [480, 105], [190, 150], [345, 255]] : [[455, 215], [480, 105]];
+const pin = (x: number, y: number) => `M${x} ${y} c-9 0 -15 -7 -15 -15 a15 15 0 0 1 30 0 c0 8 -6 15 -15 15z`;
+---
+<div class={`citymap v-${variant}`}>
+  <svg viewBox="0 0 560 500" role="img" aria-label={t.aria}>
+    <defs>
+      <clipPath id="mapclip"><rect width="560" height="500" rx="28" /></clipPath>
+    </defs>
+    <g clip-path="url(#mapclip)">
+      <rect width="560" height="500" class="m-bg" />
+      <path d="M0 470 C120 440 260 480 380 455 C460 440 520 450 560 440 V500 H0Z" class="m-river" />
+      {streets.map((d) => <path d={d} class="m-street" />)}
+      <rect x="185" y="175" width="100" height="50" rx="8" class="m-block" />
+      <rect x="320" y="245" width="80" height="60" rx="8" class="m-block" />
+      <rect x="440" y="250" width="55" height="55" rx="8" class="m-block" />
+      <rect x="80" y="170" width="70" height="55" rx="8" class="m-block" />
+    </g>
+
+    <g class="g-hand"><path id="r-van1" d={van1} class="m-route m-van" />
+    <path id="r-van2" d={van2} class="m-route m-van" /></g>
+    <g class="g-fleet"><path id="r-fleet1" d={fleet1} class="m-route m-fleet" />
+    <path d={fleet2} class="m-route m-fleet" />{variant === 'fleet' && fleetExtra.map((d, i) => <path id={`r-fx${i}`} d={d} class="m-route m-fleet" />)}</g>
+    <g class="g-link">{linkA.concat(linkB).map((d, i) => <path id={`r-link${i}`} d={d} class="m-route m-link" />)}</g>
+
+    {[0, 1, 2, 3, 4].map((i) => (
+      <circle r="5" class="m-dot-link g-link"><animateMotion dur={`${2.4 + i * 0.35}s`} repeatCount="indefinite"><mpath href={`#r-link${i}`} /></animateMotion></circle>
+    ))}
+    <circle r="7" class="m-dot-van g-hand"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#r-van1" /></animateMotion></circle>
+    <circle r="7" class="m-dot-van g-hand"><animateMotion dur="3.8s" repeatCount="indefinite"><mpath href="#r-van2" /></animateMotion></circle>
+    <circle r="7" class="m-dot-fleet g-fleet"><animateMotion dur="4.2s" repeatCount="indefinite"><mpath href="#r-fleet1" /></animateMotion></circle>
+    {variant === 'fleet' && [0, 1].map((i) => (<circle r="7" class="m-dot-fleet"><animateMotion dur={`${3.4 + i}s`} repeatCount="indefinite"><mpath href={`#r-fx${i}`} /></animateMotion></circle>))}
+
+    {drops.map(([x, y]) => (<g class="g-link"><path d={pin(x, y)} class="m-pin-link" /><circle cx={x} cy={y - 15} r="5" fill="#fff" /></g>))}
+    {venues.map(([x, y]) => (<g class="g-fleet"><rect x={x - 15} y={y - 15} width="30" height="30" rx="9" class="m-venue" /><path d={`M${x - 6} ${y + 6} V${y - 4} M${x - 6} ${y - 1} h4 M${x + 4} ${y + 6} V${y - 6}`} class="m-venue-ico" /></g>))}
+    <g class="m-hand g-link">
+      <circle cx="230" cy="300" r="14" /><circle cx="360" cy="380" r="14" />
+    </g>
+    <g class="m-hub g-fleet">
+      <rect x="62" y="392" width="56" height="56" rx="16" />
+      <path d="M76 428 V412 H96 L104 420 V428 Z" class="m-hub-ico" />
+      <circle cx="82" cy="430" r="3.5" class="m-hub-wheel" /><circle cx="98" cy="430" r="3.5" class="m-hub-wheel" />
+    </g>
+  </svg>
+
+  <div class="map-card mc-1 g-link">
+    <span class="mc-dot mc-link"></span>
+    <div><strong>{t.c1.t}</strong><span>{t.c1.s}</span></div>
+  </div>
+  <div class="map-card mc-2 g-link">
+    <span class="mc-check">✓</span>
+    <div><strong>{t.c2.t}</strong><span>{t.c2.s}</span></div>
+  </div>
+  <div class="map-card mc-3 g-fleet">
+    <span class="mc-dot mc-fleet"></span>
+    <div><strong>{t.c3.t}</strong><span>{t.c3.s}</span></div>
+  </div>
+</div>

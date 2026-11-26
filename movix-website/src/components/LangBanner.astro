@@ -1,0 +1,49 @@
+---
+/**
+ * Suggests the page in the visitor's browser language, without redirecting (redirects confuse search engines and
+ * link previews). Every offer is a real link written in the language it offers; a small script reveals the right one.
+ */
+import { banner } from '../i18n/ui';
+import { localeMeta, type Locale } from '../i18n';
+interface Props { locale: Locale; alts: { locale: Locale; href: string }[] }
+const { locale, alts } = Astro.props;
+const others = alts.filter((a) => a.locale !== locale);
+---
+{others.length > 0 && (
+  <div class="lang-banner" data-lang-banner hidden>
+    <div class="wrap">
+      {others.map((a) => (
+        <p data-lang-offer={a.locale} lang={localeMeta[a.locale].htmlLang} hidden>
+          <span>{banner[a.locale].text}</span>
+          <a href={a.href} hreflang={localeMeta[a.locale].hreflang} data-lang-pick>{banner[a.locale].go}</a>
+          <button type="button" data-lang-close aria-label={banner[a.locale].close}>×</button>
+        </p>
+      ))}
+    </div>
+  </div>
+)}
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-lang-banner]');
+  if (bar) {
+    const key = 'movix-lang-banner';
+    let off = false;
+    try { off = localStorage.getItem(key) === 'off'; } catch { /* storage may be blocked */ }
+    const prefs = (navigator.languages?.length ? [...navigator.languages] : [navigator.language]).map((l) => l.toLowerCase().split('-')[0]);
+    const here = document.documentElement.lang.toLowerCase().split('-')[0];
+    // Walk the visitor's languages in order: stop if the page already matches, offer the first one we have.
+    let offer: HTMLElement | null = null;
+    for (const p of prefs) {
+      if (p === here) break;
+      offer = bar.querySelector<HTMLElement>(`[data-lang-offer="${p}"]`);
+      if (offer) break;
+    }
+    if (offer && !off) {
+      bar.hidden = false;
+      offer.hidden = false;
+      offer.querySelector('[data-lang-close]')?.addEventListener('click', () => {
+        bar.hidden = true;
+        try { localStorage.setItem(key, 'off'); } catch { /* storage may be blocked */ }
+      });
+    }
+  }
+</script>

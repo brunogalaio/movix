@@ -1,0 +1,60 @@
+---
+import { site } from '../config/site';
+import { uiFor } from '../i18n/ui';
+import type { Locale } from '../i18n';
+interface Props { interest?: 'link' | 'fleet' | 'both'; title?: string; text?: string; locale?: Locale }
+const { interest = 'both', locale = 'en', title, text } = Astro.props;
+const c = uiFor(locale).contact;
+const options = [
+  { v: 'link', l: c.options.link },
+  { v: 'fleet', l: c.options.fleet },
+  { v: 'both', l: c.options.both },
+];
+
+// With `site.email` set, the CTA is an email button and nothing is collected on the site. The form below is the
+// fallback for a build without an address, and it sends nothing: connect it before using it on the live site.
+const brand = { link: 'linkMovix', fleet: 'fleetMovix', both: '' }[interest];
+const subject = brand ? `${c.mail.subject} · ${brand}` : c.mail.subject;
+const body = c.mail.body.replace(/\n/g, '\r\n'); // line breaks in a mailto body are CRLF
+const mailto = site.email ? `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}` : null;
+---
+<section class="section" id="contact">
+  <div class="wrap">
+    <div class="cta-card">
+      <div class="cta-copy">
+        <h2>{title ?? c.title}</h2>
+        <p>{text ?? c.text}</p>
+      </div>
+      {mailto ? (
+        <div class="cta-mail">
+          <a class="btn btn-dark" href={mailto}>{c.mail.button}</a>
+          <p class="cta-mail-or">{c.mail.or} <a href={`mailto:${site.email}`}>{site.email}</a></p>
+          <p class="cta-mail-hint">{c.mail.hint}</p>
+        </div>
+      ) : (
+        <form class="cta-form" data-preview-form>
+          <label>{c.name}<input id="f-name" name="name" autocomplete="name" required /></label>
+          <label>{c.email}<input id="f-email" name="email" type="email" autocomplete="email" required /></label>
+          <label>{c.company}<input id="f-company" name="company" autocomplete="organization" /></label>
+          <label>{c.interest}
+            <select id="f-interest" name="interest">
+              {options.map((o) => <option value={o.v} selected={o.v === interest}>{o.l}</option>)}
+            </select>
+          </label>
+          <button class="btn btn-dark" type="submit">{c.submit}</button>
+          <p class="form-note" role="status" hidden>{c.note}</p>
+        </form>
+      )}
+    </div>
+  </div>
+</section>
+{!mailto && (
+  <script is:inline>
+    document.querySelectorAll('[data-preview-form]').forEach(function (f) {
+      f.addEventListener('submit', function (e) {
+        e.preventDefault();
+        f.querySelector('.form-note').hidden = false;
+      });
+    });
+  </script>
+)}

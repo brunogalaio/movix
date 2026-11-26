@@ -1,0 +1,10 @@
+---
+import Mark from './Mark.astro';
+interface Props { sub?: 'movix' | 'fleet' | 'link'; size?: number; inverse?: boolean }
+const { sub = 'movix', size = 34, inverse = false } = Astro.props;
+const prefix = sub === 'movix' ? '' : sub;
+---
+<span class:list={['logo', `logo-${sub}`, { inverse }]} style={`--logo-size:${size}px`}>
+  <Mark sub={sub} size={size} />
+  <span class="wordmark">{prefix && <span class="prefix">{prefix}</span>}<span class="word">Movix</span></span>
+</span>

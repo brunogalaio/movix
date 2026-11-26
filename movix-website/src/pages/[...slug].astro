@@ -1,0 +1,23 @@
+---
+/**
+ * One route for every page in every language. The list of pages and which languages each one exists in
+ * is `pageRegistry` in src/i18n/index.ts; the copy lives in src/i18n/*.ts.
+ */
+import Home from '../views/Home.astro';
+import Link from '../views/Link.astro';
+import Fleet from '../views/Fleet.astro';
+import Company from '../views/Company.astro';
+import { liveRoutes } from '../lib/pages';
+
+export function getStaticPaths() {
+  return liveRoutes.map((r) => ({
+    params: { slug: r.path.replace(/^\/|\/$/g, '') || undefined },
+    props: { id: r.id, locale: r.locale },
+  }));
+}
+
+const { id, locale } = Astro.props;
+const views = { home: Home, link: Link, fleet: Fleet, company: Company };
+const View = views[id];
+---
+<View locale={locale} />

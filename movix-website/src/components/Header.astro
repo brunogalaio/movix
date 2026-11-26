@@ -1,0 +1,35 @@
+---
+import Logo from './Logo.astro';
+import LangSwitch from './LangSwitch.astro';
+import { alternates, hrefFor, isPageId, pathFor, type Locale, type PageId } from '../i18n';
+import { isLive } from '../lib/pages';
+import { uiFor } from '../i18n/ui';
+interface Props { current?: 'home' | 'link' | 'fleet' | 'company' | 'blog'; cta?: string; locale?: Locale }
+const { current = 'home', cta = '#contact', locale = 'en' } = Astro.props;
+const u = uiFor(locale);
+const nav: { href: string; label: string; id: PageId }[] = [
+  { href: hrefFor('link', locale), label: u.nav.link, id: 'link' },
+  { href: hrefFor('fleet', locale), label: u.nav.fleet, id: 'fleet' },
+  { href: hrefFor('company', locale), label: u.nav.company, id: 'company' },
+].filter((l) => isLive(l.id));
+const alts = isPageId(current) ? alternates(current) : [];
+---
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a href={pathFor('home', locale)} class="brand" aria-label={u.brandHome}><Logo size={34} /></a>
+    <nav aria-label={u.nav.main} class="nav">
+      <ul>
+        {nav.map((l) => (
+          <li><a href={l.href} class={`nav-${l.id}`} aria-current={l.id === current ? 'page' : undefined}>{l.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <LangSwitch locale={locale} alts={alts} />
+      <a class="btn btn-primary btn-sm header-cta" href={cta}>{u.nav.cta}</a>
+    </div>
+  </div>
+  <nav aria-label={u.nav.mobile} class="nav-mobile">
+    {nav.map((l) => <a href={l.href} aria-current={l.id === current ? 'page' : undefined}>{l.label}</a>)}
+  </nav>
+</header>

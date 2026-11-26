@@ -1,0 +1,68 @@
+---
+import '@fontsource-variable/outfit/wght.css';
+import '@fontsource-variable/dm-sans/wght.css';
+import '../styles/brands.css';
+import '../styles/site.css';
+import outfitLatin from '@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2?url';
+import dmSansLatin from '@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?url';
+import { site } from '../config/site';
+import { organization, website } from '../lib/schema';
+import LangBanner from '../components/LangBanner.astro';
+import { alternates, defaultLocale, isPageId, localeMeta, pathFor, type Locale } from '../i18n';
+import { uiFor } from '../i18n/ui';
+
+interface Props {
+  title: string; // 50–60 characters, main keyword first
+  description: string; // 140–160 characters
+  page?: 'home' | 'link' | 'fleet' | 'company' | 'blog';
+  locale?: Locale;
+  schema?: Record<string, unknown>[];
+  ogImage?: string;
+  noindex?: boolean;
+  ogType?: 'website' | 'article';
+}
+const { title, description, page = 'home', locale = defaultLocale, schema = [], ogImage = '/og.png', noindex = false, ogType = 'website' } = Astro.props;
+const abs = (p: string) => new URL(p, site.url).href;
+const canonical = abs(Astro.url.pathname);
+const hidden = noindex || site.noindex;
+const graph = { '@context': 'https://schema.org', '@graph': [organization(locale), website(locale), ...schema] };
+// The other language versions of this page (the blog is English only, so it has none).
+const alts = isPageId(page) ? alternates(page) : [];
+const multi = alts.length > 1;
+---
+<!doctype html>
+<html lang={localeMeta[locale].htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {multi && alts.map((a) => <link rel="alternate" hreflang={localeMeta[a.locale].hreflang} href={abs(a.href)} />)}
+    {multi && <link rel="alternate" hreflang="x-default" href={abs(pathFor(page as 'home', defaultLocale))} />}
+    <meta name="robots" content={hidden ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'} />
+    <link rel="preload" href={outfitLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={dmSansLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#FF3D6E" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={abs(ogImage)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={localeMeta[locale].og} />
+    {alts.filter((a) => a.locale !== locale).map((a) => <meta property="og:locale:alternate" content={localeMeta[a.locale].og} />)}
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(graph)} />
+  </head>
+  <body class={`page-${page}`}>
+    <a class="skip" href="#main">{uiFor(locale).skip}</a>
+    <LangBanner locale={locale} alts={alts} />
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "movix-website",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "build:preview": "astro build && node scripts/build-preview.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource-variable/outfit": "^5.3.0",
+    "astro": "7.4.2"
+  },
+  "engines": {
+    "node": ">=22.23.4"
+  }
+}

@@ -1,0 +1,46 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import Logo from '../../components/Logo.astro';
+import { site } from '../../config/site';
+import { posts } from '../../lib/blog';
+import { breadcrumbs } from '../../lib/schema';
+const fmt = (d: string) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Base
+  page="blog"
+  title="Movix | Success cases from linkMovix and fleetMovix"
+  description="How carriers and logistics operators deliver more with Movix: success cases from linkMovix, the idle-driver gateway, and fleetMovix, our Lisbon cross-dock."
+  noindex={!site.blogPublic}
+  schema={[breadcrumbs([{ name: 'Success cases', path: '/blog/' }])]}
+>
+  <Header current="blog" cta="/#contact" />
+  <main id="main">
+    <section class="hero hero-company">
+      <div class="wrap">
+        {!site.blogPublic && <p class="hidden-note">Hidden: this blog is not linked anywhere and not indexed until it goes public.</p>}
+        <p class="eyebrow"><span class="pulse"></span>Success cases</p>
+        <h1>Deliveries that <span class="grad">moved the numbers.</span></h1>
+        <p class="lead">Real stories from carriers and logistics operators working with linkMovix and fleetMovix.</p>
+      </div>
+    </section>
+    <section class="section">
+      <div class="wrap">
+        <ul class="post-list">
+          {posts.map((p) => (
+            <li>
+              <a class="post-card" href={`/blog/${p.slug}/`}>
+                <Logo sub={p.service === 'linkMovix' ? 'link' : 'fleet'} size={24} />
+                <h2>{p.title}</h2>
+                <p>{p.description}</p>
+                <span class="post-meta">{fmt(p.date)}{p.example && ' · Template'}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>
